@@ -1,0 +1,43 @@
+{
+    "campusName": "USTO-MB Mohamed Boudiaf",
+    "mapCenter": [35.708026, -0.578963],
+    "initialZoom": 17,
+    "locations": [
+        {
+            "id": 1,
+            "name": "Amphi A8",
+            "category": "amphi",
+            "icon": "graduation-cap",
+            "markerColor": "#ef4444",
+            "coords": [35.707726, -0.578723],
+            "desc": "Main lecture hall for technology students."
+        },
+        {
+            "id": 2,
+            "name": "Twins Cafeteria",
+            "category": "food",
+            "icon": "utensils",
+            "markerColor": "#f59e0b",
+            "coords": [35.707829, -0.577247],
+            "desc": "Central food court and social area."
+        },
+        {
+            "id": 3,
+            "name": "Library (Bibliothèque)",
+            "category": "library",
+            "icon": "book",
+            "markerColor": "#5D1818",
+            "coords": [35.708500, -0.579500],
+            "desc": "Quiet study zones and resource center."
+        },
+        {
+            "id": 4,
+            "name": "Main Administration",
+            "category": "admin",
+            "icon": "user-tie",
+            "markerColor": "#8b5cf6",
+            "coords": [35.709100, -0.578800],
+            "desc": "Student affairs and rectorate."
+        }
+    ]
+}

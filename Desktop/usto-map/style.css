@@ -1,0 +1,217 @@
+:root {
+    --blue: #2563eb;
+    --red: #ef4444;
+    --bg: rgba(255, 255, 255, 0.9);
+    --radius: 12px;
+}
+
+body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; }
+
+#map { height: 100vh; width: 100vw; z-index: 1; }
+
+
+
+.floating-panel {
+    position: absolute; top: 15px; left: 15px; z-index: 1000;
+    background: var(--bg); backdrop-filter: blur(10px);
+    width: 320px; padding: 20px; border-radius: var(--radius);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.2);
+}
+
+.header h1 { margin: 0; font-size: 18px; color: #1e293b; }
+.tag { font-size: 10px; background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 10px; }
+
+#searchInput {
+    width: 100%; padding: 12px; margin: 15px 0; border-radius: 8px;
+    border: 1px solid #ddd; outline: none; box-sizing: border-box;
+}
+
+.filters { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px; }
+.filters button {
+    white-space: nowrap; padding: 6px 12px; border-radius: 20px;
+    border: 1px solid #ddd; cursor: pointer; font-size: 12px;
+    color: white;
+    transition: transform 0.3s ease; 
+    
+}
+
+.filters button:hover{
+  transform: scale(1.1);
+}
+
+/* Individual Category Colors */
+.btn-all { background-color: #64748b;  } 
+.btn-department { background-color: 	#d9b99b; }            
+.btn-amphi {background-color: #ef4444; }             
+.btn-tp { background-color: #8AFF8A; }             
+.btn-td { background-color: #3b82f6; }             
+.btn-food { background-color: #f59e0b; }              
+.btn-library { background-color: #5D1818; }             
+.btn-admin { background-color: #8b5cf6; }  
+.btn-mossala { background-color: #181818; }   
+
+
+
+.primary-btn {
+    width: 100%; background: var(--blue); color: white; border: none;
+    padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;
+}
+
+.secondary-btn {
+    width: 100%; background: #f1f5f9; color: #475569; border: none;
+    padding: 8px; border-radius: 8px; cursor: pointer; margin-top: 5px;
+}
+/* Custom Marker Pin Styling */
+.custom-pin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pin-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50% 50% 50% 0; /* Creates a drop shape */
+    transform: rotate(-45deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.pin-circle i {
+    transform: rotate(45deg); /* Flips the icon back to upright */
+    font-size: 14px;
+}
+
+/* Optional: Shadow effect on the map */
+.custom-pin::after {
+    content: "";
+    width: 10px;
+    height: 3px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 50%;
+    margin-top: -2px;
+}
+
+/* Fix mobile UI */
+@media (max-width: 480px) {
+    .floating-panel { left: 10px; right: 10px; width: auto; top: 10px; }
+}
+
+#add-trigger {
+    position: absolute; bottom: 30px; right: 20px; z-index: 1000;
+    width: 60px; height: 60px; border-radius: 50%;
+    background: #10b981; color: white; border: none;
+    font-size: 24px; box-shadow: var(--shadow); cursor: pointer;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* THE FIX: This makes the background "invisible" to mouse clicks */
+    pointer-events: none; 
+}
+
+.modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    
+    /* THE FIX: This makes sure you can still click inside the form */
+    pointer-events: auto; 
+    
+    background: var(--bg);
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+}
+
+/* Style for both Inputs and Select dropdowns */
+.modal-content input, 
+.modal-content select {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0; /* Soft gray border */
+    background-color: #f8fafc; /* Very light background */
+    font-size: 14px;
+    font-family: inherit;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
+    appearance: none; /* Removes default system arrow for select */
+}
+
+/* Style specifically for the Select (Dropdown) to add a custom arrow */
+.modal-content select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+/* Focus effect: Blue border and glow when clicking */
+.modal-content input:focus, 
+.modal-content select:focus {
+    border-color: var(--blue);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+/* Styling the placeholder text */
+.modal-content input::placeholder {
+    color: #94a3b8;
+}
+
+/* Styling the option list (Limited styling available here) */
+.modal-content option {
+    background-color: #ffffff;
+    color: #1e293b;
+    padding: 10px;
+}
+
+@media (max-width: 480px) {
+    .floating-panel { left: 10px; right: 10px; width: auto; }
+}
+
+/* Toast Notification Styling */
+.toast-message {
+    position: fixed;
+    bottom: -100px; /* Start hidden below screen */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(31, 41, 55, 0.9); /* Dark background */
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    transition: bottom 0.5s ease, opacity 0.5s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    opacity: 0;
+}
+
+.toast-message.show {
+    bottom: 100px; /* Slide up into view */
+    opacity: 1;
+}
