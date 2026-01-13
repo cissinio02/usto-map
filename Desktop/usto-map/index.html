@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Trouvez facilement vos amphis, salles de TP et laboratoires à l'USTO-MB Oran.">
     <meta name="keywords" content="USTO, Oran, Map, Université, Campus, Amphi, Etudiants">
+    <meta name="theme-color" content="#2563eb">
     <title>USTO-MB Map | Campus Guide</title>
     <link rel="icon" type="image/png" href="image/logo.png"/>
     
@@ -15,16 +16,17 @@
 </head>
 <body>
 
+    <!-- Panneau de contrôle principal -->
     <div id="ui-layer" class="floating-panel">
         <div class="header">
-            <h1>USTO-MB Map</h1>
+            <h1>🗺️ USTO-MB Map</h1>
             <span class="tag">By Students, For Students.</span>
         </div>
         
-        <input type="text" id="searchInput" placeholder="Search amphi, food, dept..." onkeyup="searchMap()">
+        <input type="text" id="searchInput" placeholder="🔍 Chercher amphi, resto, dept..." onkeyup="searchMap()">
         
         <div class="filters">
-            <button onclick="filterMap('all')" class="btn-all">All</button>
+            <button onclick="filterMap('all')" class="btn-all">Tout</button>
             <button onclick="filterMap('department')" class="btn-department"><i class="fa-solid fa-building"></i> Dept</button>
             <button onclick="filterMap('amphi')" class="btn-amphi"><i class="fa fa-university"></i> Amphi</button>
             <button onclick="filterMap('tp')" class="btn-tp"><i class="fa-solid fa-flask"></i> TP</button>
@@ -35,53 +37,88 @@
 
         <div class="routing-controls">
             <button class="primary-btn" onclick="startPathFromCurrentLocation()">
-                <i class="fa fa-location-crosshairs"></i> Directions from Me
+                <i class="fa fa-location-arrow"></i> Navigation depuis moi
+            </button>
+            <button class="secondary-btn" onclick="centerOnUser()">
+                <i class="fa fa-crosshairs"></i> Me localiser
             </button>
             <button class="secondary-btn" id="clearBtn" onclick="clearMap()" style="display:none;">
-                Clear Route
+                <i class="fa fa-times"></i> Effacer
             </button>
+        </div>
+
+        <!-- Stats en bas du panneau -->
+        <div class="stats-footer">
+            <span id="location-count">0 lieux</span> · 
+            <span id="connection-status">🟢 En ligne</span>
         </div>
     </div>
 
+    <!-- Modal de suggestion -->
     <div id="suggestion-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content">
-            <h3>📍 Suggest a New Place</h3>
-            <p style="font-size: 11px; color: #666; margin-bottom: 10px;">
-                1. Click the exact spot on the map.<br>
-                2. Fill the form below.
+            <div class="modal-header">
+                <h3>📍 Suggérer un Nouveau Lieu</h3>
+                <button class="close-modal-btn" onclick="closeModal()">✕</button>
+            </div>
+            
+            <p class="modal-instruction">
+                <strong>1.</strong> Clique sur la carte pour choisir l'emplacement exact<br>
+                <strong>2.</strong> Remplis les infos ci-dessous
             </p>
             
-            <input type="text" id="suggName" placeholder="Building Name (e.g. Lab 4)">
+            <input type="text" id="suggName" placeholder="Nom du lieu (ex: Amphi C12)">
             
             <select id="suggCat">
-                <option value="amphi">Amphi</option>
-                <option value="tp">TP</option>
-                <option value="td">TD</option>
-                <option value="food">Food</option>
-                <option value="library">Library</option>
-                <option value="admin">Administration</option>
-                <option value="mossala">Mossala</option>
+                <option value="" disabled selected>🏷️ Choisir une catégorie</option>
+                <option value="amphi">🎓 Amphi</option>
+                <option value="tp">🔬 TP</option>
+                <option value="td">📝 TD</option>
+                <option value="food">🍕 Restauration</option>
+                <option value="library">📚 Bibliothèque</option>
+                <option value="admin">🏛️ Administration</option>
+                <option value="mossala">🕌 Mossala</option>
+                <option value="department">🏢 Département</option>
             </select>
 
-            <div id="suggCoordsDisplay" style="font-size: 11px; margin: 10px 0; color: #2563eb; font-weight: bold;">
-                No location selected. Click the map!
+            <textarea id="suggDesc" placeholder="Description (optionnel)" rows="2"></textarea>
+
+            <div id="suggCoordsDisplay" class="coords-display">
+                👆 Clique sur la carte pour sélectionner
             </div>
 
             <button class="primary-btn" onclick="sendSuggestion()">
-                <i class="fa fa-paper-plane"></i> Send to Admin
+                <i class="fa fa-paper-plane"></i> Envoyer à l'admin
             </button>
-            <button class="secondary-btn" onclick="closeModal()">Cancel</button>
+            <button class="secondary-btn" onclick="closeModal()">
+                <i class="fa fa-times"></i> Annuler
+            </button>
         </div>
     </div>
 
-    <button id="add-trigger" onclick="openModal()" title="Suggest a new location">
-        <i class="fa fa-plus"></i>
-    </button>
+    <!-- Boutons d'action flottants -->
+    <div class="floating-actions">
+        <button id="add-trigger" onclick="openModal()" title="Suggérer un nouveau lieu">
+            <i class="fa fa-plus"></i>
+        </button>
+        
+        <button id="layers-trigger" onclick="toggleLayersMenu()" title="Changer de style de carte">
+            <i class="fa fa-layer-group"></i>
+        </button>
+    </div>
 
-    
+    <!-- Menu des couches (layers) -->
+    <div id="layers-menu" class="layers-menu" style="display:none;">
+        <h4>Style de Carte</h4>
+        <button onclick="changeMapStyle('street')">🗺️ Street</button>
+        <button onclick="changeMapStyle('satellite')">🛰️ Satellite</button>
+        <button onclick="changeMapStyle('topo')">⛰️ Topographique</button>
+    </div>
 
+    <!-- La carte -->
     <div id="map"></div>
 
+    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
     <script src="script.js"></script>

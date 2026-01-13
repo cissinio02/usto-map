@@ -1,5 +1,10 @@
 {
     "campusName": "USTO-MB Mohamed Boudiaf",
+    "campusInfo": {
+        "location": "Bir El Djir, Oran, Algérie",
+        "established": "1975",
+        "type": "Université des Sciences et Technologies"
+    },
     "mapCenter": [35.708026, -0.578963],
     "initialZoom": 17,
     "locations": [
@@ -7,37 +12,149 @@
             "id": 1,
             "name": "Amphi A8",
             "category": "amphi",
-            "icon": "graduation-cap",
+            "icon": "university",
             "markerColor": "#ef4444",
             "coords": [35.707726, -0.578723],
-            "desc": "Main lecture hall for technology students."
+            "desc": "Grand amphithéâtre principal pour les étudiants en technologie. Capacité: 500 places."
         },
         {
             "id": 2,
-            "name": "Twins Cafeteria",
+            "name": "Twins Cafétéria",
             "category": "food",
             "icon": "utensils",
             "markerColor": "#f59e0b",
             "coords": [35.707829, -0.577247],
-            "desc": "Central food court and social area."
+            "desc": "Restaurant central du campus. Zone sociale et de restauration."
         },
         {
             "id": 3,
-            "name": "Library (Bibliothèque)",
+            "name": "Bibliothèque Centrale",
             "category": "library",
             "icon": "book",
             "markerColor": "#5D1818",
             "coords": [35.708500, -0.579500],
-            "desc": "Quiet study zones and resource center."
+            "desc": "Bibliothèque universitaire avec espaces d'étude silencieux et ressources académiques."
         },
         {
             "id": 4,
-            "name": "Main Administration",
+            "name": "Administration Principale",
             "category": "admin",
             "icon": "user-tie",
             "markerColor": "#8b5cf6",
             "coords": [35.709100, -0.578800],
-            "desc": "Student affairs and rectorate."
+            "desc": "Bureau des affaires étudiantes et rectorat. Services administratifs."
+        },
+        {
+            "id": 5,
+            "name": "Salle A - Informatique",
+            "category": "td",
+            "icon": "laptop-code",
+            "markerColor": "#3b82f6",
+            "coords": [35.7053154, -0.5768805],
+            "desc": "Salles de TD et cours pour le département informatique."
+        },
+        {
+            "id": 6,
+            "name": "Laboratoire de Physique",
+            "category": "tp",
+            "icon": "flask",
+            "markerColor": "#8AFF8A",
+            "coords": [35.707200, -0.579200],
+            "desc": "Laboratoires de travaux pratiques en physique."
+        },
+        {
+            "id": 7,
+            "name": "Département Génie Civil",
+            "category": "department",
+            "icon": "building",
+            "markerColor": "#d9b99b",
+            "coords": [35.708800, -0.577500],
+            "desc": "Bâtiment du département de génie civil et architecture."
+        },
+        {
+            "id": 8,
+            "name": "Mossala Campus",
+            "category": "mossala",
+            "icon": "mosque",
+            "markerColor": "#181818",
+            "coords": [35.708300, -0.578200],
+            "desc": "Lieu de prière pour les étudiants et le personnel."
+        },
+        {
+            "id": 9,
+            "name": "Stade Universitaire",
+            "category": "sport",
+            "icon": "futbol",
+            "markerColor": "#10b981",
+            "coords": [35.707000, -0.580000],
+            "desc": "Terrain de sport et installations sportives."
+        },
+        {
+            "id": 10,
+            "name": "Résidence Universitaire",
+            "category": "residence",
+            "icon": "home",
+            "markerColor": "#64748b",
+            "coords": [35.706500, -0.578000],
+            "desc": "Cité universitaire pour les étudiants."
         }
-    ]
+    ],
+    "categories": [
+        {
+            "id": "all",
+            "name": "Tous",
+            "icon": "map",
+            "color": "#64748b"
+        },
+        {
+            "id": "amphi",
+            "name": "Amphithéâtres",
+            "icon": "university",
+            "color": "#ef4444"
+        },
+        {
+            "id": "tp",
+            "name": "Travaux Pratiques",
+            "icon": "flask",
+            "color": "#8AFF8A"
+        },
+        {
+            "id": "td",
+            "name": "Travaux Dirigés",
+            "icon": "pen",
+            "color": "#3b82f6"
+        },
+        {
+            "id": "food",
+            "name": "Restauration",
+            "icon": "utensils",
+            "color": "#f59e0b"
+        },
+        {
+            "id": "library",
+            "name": "Bibliothèque",
+            "icon": "book",
+            "color": "#5D1818"
+        },
+        {
+            "id": "admin",
+            "name": "Administration",
+            "icon": "user-tie",
+            "color": "#8b5cf6"
+        },
+        {
+            "id": "department",
+            "name": "Départements",
+            "icon": "building",
+            "color": "#d9b99b"
+        },
+        {
+            "id": "mossala",
+            "name": "Mossala",
+            "icon": "mosque",
+            "color": "#181818"
+        }
+    ],
+    "version": "2.0",
+    "lastUpdated": "2025-01-13"
 }
