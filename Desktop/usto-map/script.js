@@ -572,7 +572,8 @@ function stopNavigation() {
 
 // ========== MODAL SUGGESTION ==========
 function openModal() {
-    document.getElementById('suggestion-modal').style.display = 'flex';
+    const modal = document.getElementById('suggestion-modal');
+    modal.style.display = 'flex';
     suggestionMode = true;
     selectedCoords = null;
     document.getElementById('suggCoordsDisplay').innerHTML = "👆 Clique sur la carte pour choisir l'emplacement";
@@ -586,7 +587,8 @@ function openModal() {
 }
 
 function closeModal() {
-    document.getElementById('suggestion-modal').style.display = 'none';
+    const modal = document.getElementById('suggestion-modal');
+    modal.style.display = 'none';
     suggestionMode = false;
     
     if (tempSelectionMarker) {
@@ -655,6 +657,22 @@ function centerOnUser() {
     } else {
         showToast("📍 Localisation en cours...");
         getCurrentLocation();
+    }
+}
+
+// ========== TOGGLE PANNEAU ==========
+function togglePanel() {
+    const panel = document.getElementById('ui-layer');
+    const btn = document.getElementById('toggle-panel-btn');
+    
+    panel.classList.toggle('collapsed');
+    
+    if (panel.classList.contains('collapsed')) {
+        btn.innerHTML = '<i class="fa fa-chevron-down"></i>';
+        showToast("📦 Panneau réduit");
+    } else {
+        btn.innerHTML = '<i class="fa fa-chevron-up"></i>';
+        showToast("📋 Panneau étendu");
     }
 }
 
