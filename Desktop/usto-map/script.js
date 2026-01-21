@@ -15,6 +15,7 @@ let filteredCategory = 'all';
 // Configuration
 const ARRIVAL_THRESHOLD = 25; // mètres pour considérer "arrivé"
 const UPDATE_INTERVAL = 2000; // ms entre calculs de distance
+const USE_CAMPUS_MODE = true; // MODE CAMPUS : lignes droites au lieu de routes
 
 // Styles de carte disponibles
 const mapStyles = {
@@ -33,6 +34,7 @@ const mapStyles = {
 };
 
 let currentTileLayer;
+let campusRouteLine = null; // Pour la ligne directe campus
 
 // ========== INITIALISATION DE LA CARTE ==========
 function initMap() {
@@ -199,10 +201,20 @@ function getDirectionsTo(lat, lng, name = "Destination") {
     
     navigator.geolocation.getCurrentPosition(pos => {
         currentTarget = { lat: lat, lng: lng, name: name };
-        drawRoute(
-            L.latLng(pos.coords.latitude, pos.coords.longitude), 
-            L.latLng(lat, lng)
-        );
+        
+        if (USE_CAMPUS_MODE) {
+            // Mode Campus : ligne droite
+            drawCampusRoute(
+                L.latLng(pos.coords.latitude, pos.coords.longitude), 
+                L.latLng(lat, lng)
+            );
+        } else {
+            // Mode classique : routes OSRM
+            drawRoute(
+                L.latLng(pos.coords.latitude, pos.coords.longitude), 
+                L.latLng(lat, lng)
+            );
+        }
     }, (error) => {
         console.error("GPS Error:", error);
         showToast("❌ Erreur GPS. Vérifie que la localisation est activée.");
@@ -323,38 +335,62 @@ function startPathFromCurrentLocation() {
 
 // ========== MISE À JOUR ROUTE EN DIRECT ==========
 function updateLiveRoute(startLat, startLng, endLat, endLng) {
-    if (routingControl) {
-        map.removeControl(routingControl);
-    }
+    if (USE_CAMPUS_MODE) {
+        // Mode Campus : mise à jour de la ligne droite
+        if (campusRouteLine) {
+            campusRouteLine.setLatLngs([
+                L.latLng(startLat, startLng),
+                L.latLng(endLat, endLng)
+            ]);
+        } else {
+            drawCampusRoute(
+                L.latLng(startLat, startLng),
+                L.latLng(endLat, endLng)
+            );
+        }
+        
+        // Calculer et afficher distance + direction
+        const distance = calculateDistance(startLat, startLng, endLat, endLng);
+        const direction = getCardinalDirection(startLat, startLng, endLat, endLng);
+        
+        updateRouteInfo(distance, distance / 1.4); // Temps estimé
+        updateDirectionIndicator(direction);
+        
+    } else {
+        // Mode classique OSRM
+        if (routingControl) {
+            map.removeControl(routingControl);
+        }
 
-    routingControl = L.Routing.control({
-        waypoints: [
-            L.latLng(startLat, startLng),
-            L.latLng(endLat, endLng)
-        ],
-        router: L.Routing.osrmv1({
-            serviceUrl: 'https://router.project-osrm.org/route/v1',
-            profile: 'foot'
-        }),
-        lineOptions: {
-            styles: [{ 
-                color: '#2563eb', 
-                weight: 6, 
-                opacity: 0.7,
-                dashArray: '10, 5'
-            }],
-            addWaypoints: false
-        },
-        createMarker: function() { return null; },
-        addWaypoints: false,
-        routeWhileDragging: false,
-        show: false,
-        fitSelectedRoutes: false
-    }).on('routesfound', function(e) {
-        const routes = e.routes;
-        const summary = routes[0].summary;
-        updateRouteInfo(summary.totalDistance, summary.totalTime);
-    }).addTo(map);
+        routingControl = L.Routing.control({
+            waypoints: [
+                L.latLng(startLat, startLng),
+                L.latLng(endLat, endLng)
+            ],
+            router: L.Routing.osrmv1({
+                serviceUrl: 'https://router.project-osrm.org/route/v1',
+                profile: 'foot'
+            }),
+            lineOptions: {
+                styles: [{ 
+                    color: '#2563eb', 
+                    weight: 6, 
+                    opacity: 0.7,
+                    dashArray: '10, 5'
+                }],
+                addWaypoints: false
+            },
+            createMarker: function() { return null; },
+            addWaypoints: false,
+            routeWhileDragging: false,
+            show: false,
+            fitSelectedRoutes: false
+        }).on('routesfound', function(e) {
+            const routes = e.routes;
+            const summary = routes[0].summary;
+            updateRouteInfo(summary.totalDistance, summary.totalTime);
+        }).addTo(map);
+    }
 
     // Centrer sur l'utilisateur avec animation
     map.panTo([startLat, startLng], { 
@@ -363,7 +399,110 @@ function updateLiveRoute(startLat, startLng, endLat, endLng) {
     });
 }
 
-// ========== TRACER UN ITINÉRAIRE ==========
+// ========== MISE À JOUR INDICATEUR DE DIRECTION ==========
+function updateDirectionIndicator(direction) {
+    let indicator = document.getElementById('direction-indicator');
+    
+    if (!indicator) {
+        const panel = document.getElementById('nav-panel');
+        if (panel) {
+            // Créer l'indicateur s'il n'existe pas
+            const directionDiv = document.createElement('div');
+            directionDiv.id = 'direction-indicator';
+            directionDiv.style.cssText = `
+                text-align: center;
+                padding: 8px;
+                background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+                border-radius: 12px;
+                margin-top: 10px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #2563eb;
+            `;
+            panel.appendChild(directionDiv);
+            indicator = directionDiv;
+        }
+    }
+    
+    if (indicator) {
+        indicator.innerHTML = `🧭 Direction: ${direction}`;
+    }
+}
+
+// ========== TRACER UN ITINÉRAIRE (MODE CAMPUS) ==========
+function drawCampusRoute(start, end) {
+    // Supprimer l'ancienne ligne
+    if (campusRouteLine) {
+        map.removeLayer(campusRouteLine);
+    }
+    
+    // Tracer une ligne droite
+    campusRouteLine = L.polyline([start, end], {
+        color: '#2563eb',
+        weight: 5,
+        opacity: 0.8,
+        dashArray: '10, 10',
+        lineCap: 'round'
+    }).addTo(map);
+    
+    // Ajouter des flèches directionnelles
+    const decorator = L.polylineDecorator(campusRouteLine, {
+        patterns: [
+            {
+                offset: '10%',
+                repeat: 100,
+                symbol: L.Symbol.arrowHead({
+                    pixelSize: 12,
+                    polygon: false,
+                    pathOptions: { 
+                        stroke: true,
+                        color: '#2563eb',
+                        weight: 3,
+                        opacity: 0.8
+                    }
+                })
+            }
+        ]
+    }).addTo(map);
+    
+    // Calculer distance et direction
+    const distance = calculateDistance(start.lat, start.lng, end.lat, end.lng);
+    const direction = getCardinalDirection(start.lat, start.lng, end.lat, end.lng);
+    
+    // Afficher les infos
+    const distanceKm = (distance / 1000).toFixed(2);
+    const distanceM = Math.round(distance);
+    const timeEstimate = Math.round(distance / 1.4); // ~1.4 m/s vitesse de marche
+    
+    showToast(`📏 ${distanceM < 1000 ? distanceM + ' m' : distanceKm + ' km'} · 🧭 ${direction} · ⏱️ ${Math.ceil(timeEstimate / 60)} min`);
+    
+    // Zoomer pour voir le trajet complet
+    map.fitBounds(campusRouteLine.getBounds(), { padding: [50, 50] });
+    
+    document.getElementById('clearBtn').style.display = 'block';
+}
+
+// ========== CALCULER LA DIRECTION CARDINALE ==========
+function getCardinalDirection(lat1, lng1, lat2, lng2) {
+    const dLng = lng2 - lng1;
+    const dLat = lat2 - lat1;
+    
+    const angle = Math.atan2(dLng, dLat) * 180 / Math.PI;
+    const normalized = (angle + 360) % 360;
+    
+    if (normalized >= 337.5 || normalized < 22.5) return "Nord ⬆️";
+    if (normalized >= 22.5 && normalized < 67.5) return "Nord-Est ↗️";
+    if (normalized >= 67.5 && normalized < 112.5) return "Est ➡️";
+    if (normalized >= 112.5 && normalized < 157.5) return "Sud-Est ↘️";
+    if (normalized >= 157.5 && normalized < 202.5) return "Sud ⬇️";
+    if (normalized >= 202.5 && normalized < 247.5) return "Sud-Ouest ↙️";
+    if (normalized >= 247.5 && normalized < 292.5) return "Ouest ⬅️";
+    if (normalized >= 292.5 && normalized < 337.5) return "Nord-Ouest ↖️";
+    
+    return "Direction inconnue";
+}
+
+// ========== TRACER UN ITINÉRAIRE (MODE ROUTE CLASSIQUE) ==========
 function drawRoute(start, end) {
     if (routingControl) map.removeControl(routingControl);
     
@@ -791,6 +930,11 @@ function clearMap() {
     if (routingControl) {
         map.removeControl(routingControl);
         routingControl = null;
+    }
+    
+    if (campusRouteLine) {
+        map.removeLayer(campusRouteLine);
+        campusRouteLine = null;
     }
     
     if (tempSelectionMarker) {
