@@ -303,6 +303,7 @@ body, html {
     box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
     cursor: pointer;
     transition: all 0.3s ease;
+    z-index: 100000;
 }
 
 #layers-trigger {
